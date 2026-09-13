@@ -1,5 +1,12 @@
 package com.porter.shipper.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -98,10 +105,57 @@ fun PorterNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            ) + fadeIn(
+                animationSpec = tween(durationMillis = 300)
+            ) + scaleIn(
+                initialScale = 0.94f,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            ) + fadeOut(
+                animationSpec = tween(durationMillis = 220)
+            ) + scaleOut(
+                targetScale = 0.96f,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            ) + fadeIn(
+                animationSpec = tween(durationMillis = 300)
+            ) + scaleIn(
+                initialScale = 0.96f,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            ) + fadeOut(
+                animationSpec = tween(durationMillis = 220)
+            ) + scaleOut(
+                targetScale = 0.94f,
+                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+            )
+        }
     ) {
         // ── Auth ──────────────────────────────────────────────────────────────
-        composable(PorterRoutes.SPLASH) {
+        composable(
+            route = PorterRoutes.SPLASH,
+            exitTransition = { fadeOut(animationSpec = tween(durationMillis = 400)) }
+        ) {
             SplashScreen(
                 onNavigateToOnboarding = {
                     navController.navigate(PorterRoutes.ONBOARDING) {
@@ -164,7 +218,8 @@ fun PorterNavGraph(
                 onViewBookings = { navController.navigate(PorterRoutes.BOOKINGS_LIST) },
                 onOpenBooking = { id -> navController.navigate(PorterRoutes.bookingDetail(id)) },
                 onOpenNotifications = { navController.navigate(PorterRoutes.NOTIFICATIONS) },
-                onOpenProfile = { navController.navigate(PorterRoutes.PROFILE) }
+                onOpenProfile = { navController.navigate(PorterRoutes.PROFILE) },
+                onOpenInvoices = { navController.navigate(PorterRoutes.INVOICES) }
             )
         }
 

@@ -57,9 +57,27 @@ import com.porter.core.ui.components.PorterCard
 import com.porter.core.ui.components.PorterPrimaryButton
 import com.porter.core.ui.components.PorterTextButton
 import com.porter.core.ui.components.StatusBadge
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
+import com.porter.core.designsystem.theme.Hairline
 import com.porter.domain.model.BookingListItem
 import com.porter.feature.home.viewmodel.HomeDashboardData
 import com.porter.feature.home.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -69,56 +87,209 @@ fun HomeScreen(
     onOpenNotifications: () -> Unit,
     onOpenProfile: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenInvoices: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    Scaffold(
-        topBar = {
-            HomeTopBar(
-                onOpenNotifications = onOpenNotifications,
-                onOpenProfile = onOpenProfile,
-                unreadNotifications = 2
-            )
-        },
-        containerColor = CanvasWhite,
-        modifier = modifier
-    ) { padding ->
-        when (val state = uiState) {
-            is UiState.Loading -> LoadingScreen(modifier = Modifier.padding(padding))
-            is UiState.Error -> ErrorScreen(
-                error = state.error,
-                onRetry = { viewModel.loadDashboard() },
-                modifier = Modifier.padding(padding)
-            )
-            is UiState.Success -> {
-                HomeContent(
-                    data = state.data,
-                    onCreateShipment = onCreateShipment,
-                    onViewBookings = onViewBookings,
-                    onOpenBooking = onOpenBooking,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = true,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = CanvasWhite,
+                drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
+                modifier = Modifier
+                    .width(320.dp)
+                    .fillMaxHeight()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+            ) {
+                Spacer(modifier = Modifier.height(12.dp))
+                ShipperDrawerHeader()
+
+                HorizontalDivider(
+                    color = Hairline,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Overview & Dashboard", style = BodyDefault) },
+                    icon = { Icon(Icons.Default.Dashboard, contentDescription = null, tint = ActionBlue) },
+                    selected = true,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = Parchment,
+                        selectedTextColor = ActionBlue,
+                        unselectedTextColor = InkNearBlack
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Create Shipment", style = BodyDefault) },
+                    icon = { Icon(Icons.Default.AddCircleOutline, contentDescription = null, tint = ActionBlue) },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()
+                            onCreateShipment()
+                        }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = InkNearBlack
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Active Shipments", style = BodyDefault) },
+                    icon = { Icon(Icons.Default.LocalShipping, contentDescription = null, tint = ActionBlue) },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()
+                            onViewBookings()
+                        }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = InkNearBlack
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Invoices & Billing", style = BodyDefault) },
+                    icon = { Icon(Icons.Default.ReceiptLong, contentDescription = null, tint = ActionBlue) },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()
+                            onOpenInvoices()
+                        }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = InkNearBlack
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Notifications", style = BodyDefault) },
+                    icon = { Icon(Icons.Default.Notifications, contentDescription = null, tint = ActionBlue) },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()
+                            onOpenNotifications()
+                        }
+                    },
+                    badge = {
+                        Badge(containerColor = StatusError) {
+                            Text("2", color = CanvasWhite)
+                        }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = InkNearBlack
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Account Profile", style = BodyDefault) },
+                    icon = { Icon(Icons.Default.Person, contentDescription = null, tint = ActionBlue) },
+                    selected = false,
+                    onClick = {
+                        scope.launch {
+                            drawerState.close()
+                            onOpenProfile()
+                        }
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        unselectedTextColor = InkNearBlack
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 20.dp)
+                ) {
+                    Text(
+                        text = "Porter Shipper v1.0",
+                        style = FinePrint.copy(color = InkMuted48)
+                    )
+                    Text(
+                        text = "Container Logistics Platform",
+                        style = FinePrint.copy(color = InkMuted48)
+                    )
+                }
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                HomeTopBar(
+                    onOpenDrawer = { scope.launch { drawerState.open() } },
+                    onOpenNotifications = onOpenNotifications,
+                    onOpenProfile = onOpenProfile,
+                    unreadNotifications = 2
+                )
+            },
+            containerColor = CanvasWhite,
+            modifier = modifier
+        ) { padding ->
+            when (val state = uiState) {
+                is UiState.Loading -> LoadingScreen(modifier = Modifier.padding(padding))
+                is UiState.Error -> ErrorScreen(
+                    error = state.error,
+                    onRetry = { viewModel.loadDashboard() },
                     modifier = Modifier.padding(padding)
                 )
+                is UiState.Success -> {
+                    HomeContent(
+                        data = state.data,
+                        onCreateShipment = onCreateShipment,
+                        onViewBookings = onViewBookings,
+                        onOpenBooking = onOpenBooking,
+                        modifier = Modifier.padding(padding)
+                    )
+                }
+                else -> {}
             }
-            else -> {}
         }
     }
 }
 
 @Composable
-private fun HomeTopBar(
-    onOpenNotifications: () -> Unit,
-    onOpenProfile: () -> Unit,
-    unreadNotifications: Int
-) {
+private fun ShipperDrawerHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(CanvasWhite)
-            .padding(horizontal = 20.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(Parchment, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocalShipping,
+                contentDescription = null,
+                tint = ActionBlue,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(14.dp))
         Column {
             Text(
                 text = "PORTER",
@@ -129,9 +300,56 @@ private fun HomeTopBar(
                 )
             )
             Text(
-                text = "Freight Logistics",
+                text = "Acme Logistics Pvt Ltd",
+                style = BodyStrong.copy(fontSize = 15.sp, color = InkNearBlack)
+            )
+            Text(
+                text = "GSTIN Verified • Shipper",
                 style = FinePrint.copy(color = InkMuted48)
             )
+        }
+    }
+}
+
+@Composable
+private fun HomeTopBar(
+    onOpenDrawer: () -> Unit,
+    onOpenNotifications: () -> Unit,
+    onOpenProfile: () -> Unit,
+    unreadNotifications: Int
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(CanvasWhite)
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onOpenDrawer) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Open Navigation Menu",
+                    tint = InkNearBlack
+                )
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+            Column {
+                Text(
+                    text = "PORTER",
+                    style = BodyDefault.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 3.sp,
+                        color = ActionBlue
+                    )
+                )
+                Text(
+                    text = "Freight Logistics",
+                    style = FinePrint.copy(color = InkMuted48)
+                )
+            }
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
