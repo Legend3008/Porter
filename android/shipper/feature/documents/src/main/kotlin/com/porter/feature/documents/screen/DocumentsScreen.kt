@@ -32,8 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.porter.core.common.UiState
 import com.porter.core.designsystem.theme.ActionBlue
 import com.porter.core.designsystem.theme.BodyDefault
@@ -62,7 +62,7 @@ fun DocumentsScreen(
     modifier: Modifier = Modifier,
     viewModel: DocumentsViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(bookingId) {
         viewModel.loadDocuments(bookingId)

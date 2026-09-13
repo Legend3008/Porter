@@ -18,7 +18,10 @@ class PorterApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        // Firebase is initialized via google-services plugin
-        // Crashlytics is active in release builds automatically
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            android.util.Log.e("PorterCrash", "FATAL CRASH on thread ${thread.name}: ${throwable.message}", throwable)
+            defaultHandler?.uncaughtException(thread, throwable)
+        }
     }
 }

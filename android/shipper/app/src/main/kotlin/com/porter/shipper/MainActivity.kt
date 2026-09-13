@@ -22,7 +22,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             PorterTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    PorterNavGraph()
+                    val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        androidx.lifecycle.compose.LocalLifecycleOwner provides lifecycleOwner
+                    ) {
+                        PorterNavGraph()
+                    }
                 }
             }
         }

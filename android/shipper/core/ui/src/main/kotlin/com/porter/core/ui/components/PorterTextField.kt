@@ -50,7 +50,7 @@ fun PorterTextField(
             modifier = Modifier.fillMaxWidth(),
             label = { Text(text = label, style = Caption) },
             placeholder = if (placeholder.isNotBlank()) {
-                { Text(text = placeholder, style = BodyDefault, color = InkMuted48) }
+                @Composable { Text(text = placeholder, style = BodyDefault, color = InkMuted48) }
             } else null,
             enabled = enabled,
             readOnly = readOnly,

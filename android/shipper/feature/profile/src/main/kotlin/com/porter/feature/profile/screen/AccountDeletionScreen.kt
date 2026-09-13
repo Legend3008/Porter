@@ -27,8 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.porter.core.common.UiState
 import com.porter.core.designsystem.theme.BodyDefault
 import com.porter.core.designsystem.theme.CanvasWhite
@@ -50,7 +50,7 @@ fun AccountDeletionScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     var confirmed by remember { mutableStateOf(false) }
-    val deleteState by viewModel.deleteState.collectAsStateWithLifecycle()
+    val deleteState by viewModel.deleteState.collectAsState()
 
     LaunchedEffect(deleteState) {
         if (deleteState is UiState.Success) {

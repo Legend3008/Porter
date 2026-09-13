@@ -26,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.porter.core.common.UiState
 import com.porter.core.designsystem.theme.ActionBlue
 import com.porter.core.designsystem.theme.BodyDefault
@@ -58,7 +58,7 @@ fun QuoteScreen(
     modifier: Modifier = Modifier,
     viewModel: BookingFlowViewModel = hiltViewModel(),
 ) {
-    val quoteState by viewModel.quoteState.collectAsStateWithLifecycle()
+    val quoteState by viewModel.quoteState.collectAsState()
 
     LaunchedEffect(Unit) {
         if (quoteState !is UiState.Success) {
