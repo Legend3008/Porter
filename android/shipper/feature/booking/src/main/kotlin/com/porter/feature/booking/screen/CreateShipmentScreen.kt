@@ -34,6 +34,7 @@ import com.porter.core.designsystem.theme.FinePrint
 import com.porter.core.designsystem.theme.HeroDisplay
 import com.porter.core.designsystem.theme.InkMuted48
 import com.porter.core.designsystem.theme.InkNearBlack
+import com.porter.core.ui.components.BookingStepIndicator
 import com.porter.core.ui.components.PorterCard
 import com.porter.core.ui.components.PorterPrimaryButton
 import com.porter.core.ui.components.PorterTextField
@@ -53,10 +54,17 @@ fun CreateShipmentScreen(
 
     Scaffold(
         topBar = {
-            PorterTopBar(
-                title = "Step 1 of 4: Cargo",
-                onNavigateBack = onBack
-            )
+            Column {
+                PorterTopBar(
+                    title = "New Container Booking",
+                    onNavigateBack = onBack
+                )
+                BookingStepIndicator(
+                    currentStep = 1,
+                    totalSteps = 5,
+                    stepTitle = "Cargo Details"
+                )
+            }
         },
         containerColor = CanvasWhite,
         modifier = modifier

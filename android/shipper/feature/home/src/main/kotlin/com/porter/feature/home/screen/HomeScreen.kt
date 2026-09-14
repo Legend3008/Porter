@@ -51,12 +51,14 @@ import com.porter.core.designsystem.theme.InkNearBlack
 import com.porter.core.designsystem.theme.Parchment
 import com.porter.core.designsystem.theme.ShapePill
 import com.porter.core.designsystem.theme.StatusError
+import com.porter.core.ui.components.EmptyStateView
 import com.porter.core.ui.components.ErrorScreen
 import com.porter.core.ui.components.LoadingScreen
 import com.porter.core.ui.components.PorterCard
 import com.porter.core.ui.components.PorterPrimaryButton
 import com.porter.core.ui.components.PorterTextButton
 import com.porter.core.ui.components.StatusBadge
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -454,6 +456,47 @@ private fun HomeContent(
             }
         }
 
+        // Zeigarnik Effect: Incomplete Draft Resume Prompt
+        item {
+            PorterCard(
+                onClick = onCreateShipment,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(ActionBlue.copy(alpha = 0.05f))
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "CONTINUE RECENT DRAFT",
+                            style = FinePrint.copy(
+                                color = ActionBlue,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "JNPT Port Terminal → Bhiwandi Hub",
+                            style = BodyStrong.copy(fontSize = 15.sp, color = InkNearBlack)
+                        )
+                        Text(
+                            text = "Step 2 of 5 completed • Rate lock guarantee active",
+                            style = FinePrint.copy(color = InkMuted48)
+                        )
+                    }
+                    PorterTextButton(
+                        text = "Resume →",
+                        onClick = onCreateShipment
+                    )
+                }
+            }
+        }
+
         // Active Shipments Header
         item {
             Row(
@@ -474,30 +517,14 @@ private fun HomeContent(
 
         if (data.activeBookings.isEmpty()) {
             item {
-                PorterCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocalShipping,
-                            contentDescription = null,
-                            tint = InkMuted48,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "No active container shipments",
-                            style = BodyStrong.copy(color = InkNearBlack)
-                        )
-                        Text(
-                            text = "Create your first shipment to get instant quote and live tracking.",
-                            style = Caption.copy(color = InkMuted48)
-                        )
-                    }
-                }
+                EmptyStateView(
+                    icon = Icons.Default.LocalShipping,
+                    title = "No active container shipments",
+                    description = "Dispatch orders created will display here with live satellite GPS telemetry, port gate-in verification, and driver coordinates.",
+                    actionLabel = "Book Container Now",
+                    onAction = onCreateShipment,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         } else {
             items(data.activeBookings, key = { it.id }) { booking ->

@@ -42,11 +42,13 @@ import com.porter.core.designsystem.theme.InkNearBlack
 import com.porter.core.designsystem.theme.Parchment
 import com.porter.core.designsystem.theme.ShapePill
 import com.porter.core.designsystem.theme.StatusWarning
+import com.porter.core.ui.components.BookingStepIndicator
 import com.porter.core.ui.components.ErrorScreen
 import com.porter.core.ui.components.LoadingScreen
 import com.porter.core.ui.components.PorterCard
 import com.porter.core.ui.components.PorterPrimaryButton
 import com.porter.core.ui.components.PorterTopBar
+import com.porter.core.ui.components.StagedLaborLoader
 import com.porter.domain.model.Quote
 import com.porter.feature.booking.viewmodel.BookingFlowViewModel
 import kotlinx.coroutines.delay
@@ -68,16 +70,32 @@ fun QuoteScreen(
 
     Scaffold(
         topBar = {
-            PorterTopBar(
-                title = "Guaranteed Freight Quote",
-                onNavigateBack = onBack
-            )
+            Column {
+                PorterTopBar(
+                    title = "New Container Booking",
+                    onNavigateBack = onBack
+                )
+                BookingStepIndicator(
+                    currentStep = 4,
+                    totalSteps = 5,
+                    stepTitle = "Guaranteed Quote"
+                )
+            }
         },
         containerColor = CanvasWhite,
         modifier = modifier
     ) { padding ->
         when (val state = quoteState) {
-            is UiState.Loading -> LoadingScreen(modifier = Modifier.padding(padding))
+            is UiState.Loading -> StagedLaborLoader(
+                title = "Calculating Guaranteed Rate",
+                stages = listOf(
+                    "Verifying port gate & inland ICD route",
+                    "Calculating container freight, toll & fuel surcharge",
+                    "Securing 15-minute price lock guarantee"
+                ),
+                footnote = "Zero hidden fees. Your quote is locked for 15 minutes once loaded.",
+                modifier = Modifier.padding(padding)
+            )
             is UiState.Error -> ErrorScreen(
                 error = state.error,
                 onRetry = { viewModel.requestQuote() },

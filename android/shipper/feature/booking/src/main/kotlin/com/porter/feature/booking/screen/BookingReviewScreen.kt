@@ -1,6 +1,7 @@
 package com.porter.feature.booking.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +55,7 @@ fun BookingReviewScreen(
     val draft by viewModel.draft.collectAsState()
     val confirmState by viewModel.confirmState.collectAsState()
     var agreedToTerms by remember { mutableStateOf(true) }
+    var showBreakdown by remember { mutableStateOf(false) }
 
     LaunchedEffect(confirmState) {
         if (confirmState is UiState.Success) {
@@ -66,10 +68,17 @@ fun BookingReviewScreen(
 
     Scaffold(
         topBar = {
-            PorterTopBar(
-                title = "Review & Confirm Booking",
-                onNavigateBack = onBack
-            )
+            Column {
+                PorterTopBar(
+                    title = "Review & Confirm Booking",
+                    onNavigateBack = onBack
+                )
+                com.porter.core.ui.components.BookingStepIndicator(
+                    currentStep = 5,
+                    totalSteps = 5,
+                    stepTitle = "Final Review & Confirm"
+                )
+            }
         },
         containerColor = CanvasWhite,
         modifier = modifier
@@ -113,21 +122,65 @@ fun BookingReviewScreen(
 
                         Divider(color = Hairline)
 
-                        val totalInr = (draft.quote?.totalFarePaise ?: 4543000L) / 100
+                        val quote = draft.quote
+                        val totalInr = (quote?.totalFarePaise ?: 4543000L) / 100
+                        val baseInr = (quote?.baseFarePaise ?: 3400000L) / 100
+                        val fuelInr = (quote?.fuelSurchargePaise ?: 450000L) / 100
+                        val portInr = (quote?.portHandlingPaise ?: 350000L) / 100
+                        val tollInr = (quote?.otherSurchargePaise ?: 343000L) / 100
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Final Total (incl. GST)", style = BodyStrong.copy(color = InkNearBlack))
-                            Text(text = "₹$totalInr", style = BodyStrong.copy(color = ActionBlue, fontSize = 18.sp))
+                            Column {
+                                Text(text = "Final Total (incl. GST)", style = BodyStrong.copy(color = InkNearBlack))
+                                Text(
+                                    text = if (showBreakdown) "Hide itemized breakdown ▲" else "View itemized breakdown ▼",
+                                    style = FinePrint.copy(color = ActionBlue, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold),
+                                    modifier = Modifier.clickable { showBreakdown = !showBreakdown }
+                                )
+                            }
+                            Text(text = "₹$totalInr", style = BodyStrong.copy(color = ActionBlue, fontSize = 20.sp))
+                        }
+
+                        if (showBreakdown) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(CanvasWhite, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                                    .padding(vertical = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                BreakdownRow("Base Line-Haul Freight", "₹$baseInr")
+                                BreakdownRow("Terminal Port Gate Handling", "₹$portInr")
+                                BreakdownRow("Diesel Index Surcharge", "₹$fuelInr")
+                                BreakdownRow("NHAI Toll & State Transit Fees", "₹$tollInr")
+                                BreakdownRow("Integrated GST (18%)", "Included")
+                            }
                         }
                     }
+                }
+
+                // Trust Guarantee Banner
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(com.porter.core.designsystem.theme.Parchment, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🛡️ 100% Guaranteed Price Lock • Free cancellation until trailer arrives at terminal gate",
+                        style = FinePrint.copy(color = InkNearBlack)
+                    )
                 }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
@@ -150,8 +203,25 @@ fun BookingReviewScreen(
                     loading = isConfirming,
                     enabled = agreedToTerms
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Secure 256-bit encrypted logistics checkout",
+                    style = FinePrint.copy(color = InkMuted48),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun BreakdownRow(label: String, amount: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, style = FinePrint.copy(color = InkMuted48))
+        Text(text = amount, style = FinePrint.copy(color = InkNearBlack, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium))
     }
 }
 

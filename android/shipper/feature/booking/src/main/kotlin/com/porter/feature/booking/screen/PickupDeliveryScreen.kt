@@ -30,6 +30,7 @@ import com.porter.core.designsystem.theme.FinePrint
 import com.porter.core.designsystem.theme.HeroDisplay
 import com.porter.core.designsystem.theme.InkMuted48
 import com.porter.core.designsystem.theme.InkNearBlack
+import com.porter.core.ui.components.BookingStepIndicator
 import com.porter.core.ui.components.PorterPrimaryButton
 import com.porter.core.ui.components.PorterTextField
 import com.porter.core.ui.components.PorterTopBar
@@ -59,10 +60,17 @@ fun PickupDeliveryScreen(
 
     Scaffold(
         topBar = {
-            PorterTopBar(
-                title = "Step 3 of 4: Route",
-                onNavigateBack = onBack
-            )
+            Column {
+                PorterTopBar(
+                    title = "New Container Booking",
+                    onNavigateBack = onBack
+                )
+                BookingStepIndicator(
+                    currentStep = 2,
+                    totalSteps = 5,
+                    stepTitle = "Terminal Route"
+                )
+            }
         },
         containerColor = CanvasWhite,
         modifier = modifier

@@ -1,12 +1,16 @@
 package com.porter.core.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.Icon
@@ -16,9 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.porter.core.common.AppError
 import com.porter.core.common.RecoveryAction
 import com.porter.core.designsystem.theme.BodyDefault
+import com.porter.core.designsystem.theme.BodyStrong
 import com.porter.core.designsystem.theme.Caption
 import com.porter.core.designsystem.theme.InkMuted48
 import com.porter.core.designsystem.theme.InkNearBlack
@@ -42,15 +48,29 @@ fun ErrorScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .background(StatusError.copy(alpha = 0.12f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "!",
+                style = BodyStrong.copy(fontSize = 32.sp, color = StatusError)
+            )
+        }
+        Spacer(Modifier.height(20.dp))
         Text(
-            text = "⚠️",
-            style = com.porter.core.designsystem.theme.HeroDisplay
+            text = "Something didn't go as expected",
+            style = com.porter.core.designsystem.theme.DisplayMd.copy(fontSize = 20.sp),
+            color = InkNearBlack,
+            textAlign = TextAlign.Center
         )
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
             text = error.userMessage,
-            style = BodyDefault,
-            color = InkNearBlack,
+            style = BodyDefault.copy(fontSize = 14.sp),
+            color = InkMuted48,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(32.dp))
@@ -61,10 +81,18 @@ fun ErrorScreen(
                     onClick = onRetry,
                     modifier = Modifier.fillMaxWidth()
                 )
+                if (onBack != null) {
+                    Spacer(Modifier.height(12.dp))
+                    PorterSecondaryButton(
+                        text = "Go Back",
+                        onClick = onBack,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
             RecoveryAction.GO_BACK -> {
                 onBack?.let {
-                    PorterSecondaryButton(
+                    PorterPrimaryButton(
                         text = "Go Back",
                         onClick = it,
                         modifier = Modifier.fillMaxWidth()

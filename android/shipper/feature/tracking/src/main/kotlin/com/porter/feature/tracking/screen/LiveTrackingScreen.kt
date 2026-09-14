@@ -255,6 +255,62 @@ private fun TrackingContent(
             }
         }
 
+        // Operational Milestone & Certainty Banner
+        PorterCard(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "CURRENT TRANSIT MILESTONE",
+                            style = FinePrint.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp,
+                                color = ActionBlue
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Approaching Vashi Toll Plaza",
+                            style = BodyStrong.copy(color = InkNearBlack)
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .background(StatusSuccess.copy(alpha = 0.12f), ShapePill)
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "ON SCHEDULE",
+                            style = FinePrint.copy(
+                                color = StatusSuccess,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Parchment, ShapePill)
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🔒 RFID Tamper-Seal #JNPT-77291: Intact • Zero Anomaly Detected",
+                        style = FinePrint.copy(color = InkNearBlack)
+                    )
+                }
+            }
+        }
+
         // Driver & Vehicle Card
         PorterCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(20.dp)) {
@@ -316,7 +372,7 @@ private fun TrackingContent(
                     }
                 }
 
-                Divider(color = Hairline, modifier = Modifier.padding(vertical = 14.dp))
+                androidx.compose.material3.HorizontalDivider(color = Hairline, modifier = Modifier.padding(vertical = 14.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

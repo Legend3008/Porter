@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +40,8 @@ import com.porter.core.designsystem.theme.InkMuted48
 import com.porter.core.designsystem.theme.InkNearBlack
 import com.porter.core.designsystem.theme.Parchment
 import com.porter.core.designsystem.theme.ShapeLg
+import com.porter.core.designsystem.theme.ShapePill
+import com.porter.core.ui.components.BookingStepIndicator
 import com.porter.core.ui.components.PorterCard
 import com.porter.core.ui.components.PorterPrimaryButton
 import com.porter.core.ui.components.PorterTextField
@@ -66,10 +70,17 @@ fun ContainerDetailsScreen(
 
     Scaffold(
         topBar = {
-            PorterTopBar(
-                title = "Step 2 of 4: Container",
-                onNavigateBack = onBack
-            )
+            Column {
+                PorterTopBar(
+                    title = "New Container Booking",
+                    onNavigateBack = onBack
+                )
+                BookingStepIndicator(
+                    currentStep = 3,
+                    totalSteps = 5,
+                    stepTitle = "Container Type"
+                )
+            }
         },
         containerColor = CanvasWhite,
         modifier = modifier
@@ -90,16 +101,17 @@ fun ContainerDetailsScreen(
                 )
 
                 Text(
-                    text = "Choose the ISO container specification required for your ocean or domestic freight cargo.",
+                    text = "Select ISO shipping container dimensions. We pair compatible multi-axle trailers automatically.",
                     style = BodyDefault.copy(color = InkMuted48)
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 containerOptions.forEach { (type, title, specs) ->
                     val isSelected = selectedType == type
+                    val isRecommended = type == ContainerType.DRY_20FT
                     val borderColor = if (isSelected) ActionBlue else Hairline
-                    val bgColor = if (isSelected) Parchment else CanvasWhite
+                    val bgColor = if (isSelected) ActionBlue.copy(alpha = 0.05f) else CanvasWhite
 
                     Box(
                         modifier = Modifier
@@ -115,12 +127,31 @@ fun ContainerDetailsScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = title,
-                                    style = BodyStrong.copy(
-                                        color = if (isSelected) ActionBlue else InkNearBlack
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = title,
+                                        style = BodyStrong.copy(
+                                            color = if (isSelected) ActionBlue else InkNearBlack
+                                        )
                                     )
-                                )
+                                    if (isRecommended) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .background(ActionBlue.copy(alpha = 0.12f), ShapePill)
+                                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(
+                                                text = "POPULAR",
+                                                style = FinePrint.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 10.sp,
+                                                    color = ActionBlue
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
                                 Text(
                                     text = type.displayName,
                                     style = FinePrint.copy(
